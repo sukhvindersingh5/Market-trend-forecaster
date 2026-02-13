@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import "../styles/landing.css";
+import "../styles/Landing.css";
 
 import echo from "../assets/echo.png";
 import nest from "../assets/nest.png";
@@ -10,6 +10,7 @@ import homepod from "../assets/homepod.png";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem("token");
 
   return (
     <>
@@ -18,20 +19,30 @@ const LandingPage = () => {
       {/* Hero Section */}
       <section className="hero">
         <h1>
-          AI-Powered Market Trend & Consumer Sentiment Analysis
+          {isLoggedIn ? "Welcome Back to Your Dashboard" : "AI-Powered Market Trend & Consumer Sentiment Analysis"}
         </h1>
         <p>
-          Compare and analyze real-time consumer sentiment and market trends
-          for top smart speakers using Artificial Intelligence.
+          {isLoggedIn 
+            ? "Explore real-time market insights and consumer sentiment analysis."
+            : "Compare and analyze real-time consumer sentiment and market trends for top smart speakers using Artificial Intelligence."
+          }
         </p>
 
         <div className="hero-buttons">
-          <button onClick={() => navigate("/login")} className="primary-btn">
-            Explore Dashboard
-          </button>
-          <button onClick={() => navigate("/signup")} className="secondary-btn">
-            Get Started
-          </button>
+          {isLoggedIn ? (
+            <button onClick={() => navigate("/dashboard")} className="primary-btn">
+              Go to Dashboard
+            </button>
+          ) : (
+            <>
+              <button onClick={() => navigate("/login")} className="primary-btn">
+                Explore Dashboard
+              </button>
+              <button onClick={() => navigate("/signup")} className="secondary-btn">
+                Get Started
+              </button>
+            </>
+          )}
         </div>
       </section>
 
@@ -83,9 +94,9 @@ const LandingPage = () => {
 
       {/* CTA */}
       <section className="cta">
-        <h2>Ready to Explore Market Intelligence?</h2>
-        <button onClick={() => navigate("/signup")} className="primary-btn">
-          Create Account
+        <h2>{isLoggedIn ? "Ready for More Insights?" : "Ready to Explore Market Intelligence?"}</h2>
+        <button onClick={() => isLoggedIn ? navigate("/dashboard") : navigate("/signup")} className="primary-btn">
+          {isLoggedIn ? "View Dashboard" : "Create Account"}
         </button>
       </section>
 

@@ -4,16 +4,16 @@ import { login } from "../services/authService";
 import "../styles/auth.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const data = await login({ email, password });
+      const data = await login({ username, password });
       localStorage.setItem("token", data.access_token);
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       alert(error.response?.data?.detail || "Login failed");
     }
@@ -28,9 +28,10 @@ const Login = () => {
         <form className="auth-form" onSubmit={handleLogin}>
           <div className="input-group">
             <input
-              type="email"
-              placeholder="Email address"
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
@@ -39,6 +40,7 @@ const Login = () => {
             <input
               type="password"
               placeholder="Password"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />

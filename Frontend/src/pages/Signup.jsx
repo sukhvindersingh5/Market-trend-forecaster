@@ -19,7 +19,7 @@ const Signup = () => {
     }
 
     try {
-      await signup({ name, email, password });
+      await signup({ username: name, email, password });
       alert("Account created successfully! Please login.");
       navigate("/login");
     } catch (error) {
@@ -38,6 +38,7 @@ const Signup = () => {
             <input
               type="text"
               placeholder="Full Name"
+              value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
@@ -47,6 +48,7 @@ const Signup = () => {
             <input
               type="email"
               placeholder="Email address"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
@@ -56,6 +58,7 @@ const Signup = () => {
             <input
               type="password"
               placeholder="Password"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
@@ -65,6 +68,7 @@ const Signup = () => {
             <input
               type="password"
               placeholder="Confirm password"
+              value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
