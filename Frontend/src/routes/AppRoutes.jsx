@@ -5,6 +5,8 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import Profile from "../pages/Profile";
+import BrandComparison from "../pages/BrandComparison";  // ✅
+import DashboardLayout from "../components/DashboardLayout";  // ✅
 import ProtectedRoute from "../components/ProtectedRoute";
 
 const AppRoutes = () => {
@@ -13,14 +15,23 @@ const AppRoutes = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route
-        path="/dashboard"
+      
+      {/* DASHBOARD LAYOUT */}
+      <Route 
+        path="/dashboard" 
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <DashboardLayout />
           </ProtectedRoute>
         }
-      />
+      >
+              <Route index element={<Dashboard />} />                           {/* /dashboard */}
+        <Route path="brands" element={<BrandComparison />} />            {/* /dashboard/brands */}
+        <Route path="alerts" element={<div>Alerts Page (Coming Soon)</div>} />
+        <Route path="reports" element={<div>Reports Page (Coming Soon)</div>} />
+        <Route path="chatbot" element={<div>AI Chatbot (Coming Soon)</div>} />
+      </Route>
+      
       <Route
         path="/profile"
         element={

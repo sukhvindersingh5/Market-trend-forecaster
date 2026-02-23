@@ -48,7 +48,7 @@ const LandingPage = () => {
 
       {/* Products Section */}
       <section className="products">
-        <h2>Products We Analyze</h2>
+        <h2 className="product">Products We Analyze</h2>
         <div className="product-grid">
           <div className="product-card">
             <img src={echo} alt="Amazon Echo Dot" />
@@ -83,7 +83,7 @@ const LandingPage = () => {
 
       {/* Features Section */}
       <section className="features" id="features">
-        <h2>Core Features</h2>
+        <h2 id="feature">Core Features</h2>
         <div className="feature-grid">
           <div className="feature-card">🤖 AI Sentiment Analysis</div>
           <div className="feature-card">📈 Market Trend Forecasting</div>
