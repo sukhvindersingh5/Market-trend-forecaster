@@ -2,148 +2,73 @@
 
 AI-Powered Market Trend & Consumer Sentiment Forecaster.
 
-This repository contains:
+## Overview
+
+MarketForecaster builds a multi-source data ingestion pipeline to collect consumer sentiment data for smart speaker products:
+- Amazon Alexa
+- Google Nest Mini
+- Apple HomePod Mini
+
+### Project Objective
+The platform aggregates social media posts, product reviews, and news data to generate consumer sentiment insights using LLM-based sentiment analysis, topic modeling, and RAG pipelines.
+
+### Data Ecosystem
+The dataset combines consumer opinions from multiple platforms:
+- **Amazon product reviews** (Kaggle dataset)
+- **YouTube comments** (YouTube Data API)
+- **News articles** (GNews API)
+- **Web-scraped product reviews** (Technology review websites)
+
+---
+
+## Repository Structure
 
 - **Frontend**: React + Vite (`Frontend/`)
 - **Backend**: FastAPI + MongoDB (`backend/`)
+- **Data Ingestion**: Python scraping and cleaning scripts (`ingestion/` and `data/`)
 
-## Prerequisites
+## Getting Started
 
-- **Node.js** 18+ (recommended)
+### Prerequisites
+
+- **Node.js** 18+
 - **Python** 3.10+
-- **MongoDB** running locally or accessible via a connection string
+- **MongoDB** running locally or via Atlas
 
-## Project structure
+### Backend (FastAPI)
 
-```
-Market-trend-forecaster/
-  Frontend/
-  backend/
-```
+1. **Setup MongoDB**: The backend reads `MONGODB_URL` from `backend/.env`.
+2. **Create Venv**: `python -m venv backend/venv`
+3. **Install Dependencies**: `pip install -r backend/requirements.txt`
+4. **Configure Env**: Copy `backend/.env.example` to `backend/.env`.
+5. **Run Server**: 
+   ```bash
+   cd backend
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+   Open `http://localhost:8000/docs` for API documentation.
 
-## Backend (FastAPI)
+### Frontend (React + Vite)
 
-### MongoDB setup (Atlas or Local + Compass)
+1. **Install Dependencies**: `cd Frontend && npm install`
+2. **Start Dev Server**: `npm run dev`
+   Available at `http://localhost:5173`.
 
-The backend reads `MONGODB_URL` from `backend/.env`.
+---
 
-#### Option A: Local MongoDB (recommended for development) + MongoDB Compass
+## Data Processing (Milestone 1)
 
-1. Install and start MongoDB Community Server.
-2. (Optional) Install **MongoDB Compass**.
-3. In Compass, connect using:
+The ingestion module performs:
+- Text cleaning (lowercase, noise removal)
+- Standardized schema alignment
+- Duplicate removal
+- Multi-source merging
 
-```
-mongodb://localhost:27017
-```
+**Final Dataset**: ~2,679 reviews/comments and 13 news articles across 3 products.
 
-Your `.env` value:
-
-```env
-MONGODB_URL=mongodb://localhost:27017
-```
-
-#### Option B: MongoDB Atlas (cloud)
-
-1. Create a cluster on MongoDB Atlas.
-2. Create a database user and allow your IP (or use `0.0.0.0/0` for testing).
-3. Click **Connect** -> **Drivers** and copy the connection string.
-
-Example `.env` value (replace placeholders):
-
-```env
-MONGODB_URL=mongodb+srv://<username>:<password>@<cluster-host>/market_trend_db?retryWrites=true&w=majority
-```
-
-If your password contains special characters, URL-encode it.
-
-### 1) Create virtual environment (recommended)
-
-From the repository root:
-
-```bash
-python -m venv backend/venv
-```
-
-Activate it:
-
-```bash
-source backend/venv/bin/activate
-```
-
-### 2) Install backend dependencies
-
-```bash
-pip install -r backend/requirements.txt
-```
-
-### 3) Configure environment variables
-
-Copy the example env file and edit as needed:
-
-```bash
-cp backend/.env.example backend/.env
-```
-
-`backend/.env` (do not commit it) should look like:
-
-```env
-MONGODB_URL=mongodb://localhost:27017
-SECRET_KEY=change-this-in-production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
-
-### 4) Run the backend server
-
-Run it from the `backend/` folder:
-
-```bash
-cd backend
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Then open:
-
-- `http://localhost:8000/docs` (Swagger UI)
-
-### Backend API routes
-
-- `POST /auth/signup`
-- `POST /auth/login`
-- `GET /users/profile` (requires Bearer token)
-- `POST /api/raw_data` (requires Bearer token)
-- `GET /api/sentiment`
-
-## Frontend (React + Vite)
-
-### 1) Install dependencies
-
-Run the command from `Frontend/`:
-
-```bash
-cd Frontend
-npm install
-```
-
-### 2) Start the development server
-
-From `Frontend/`:
-
-```bash
-npm run dev
-```
-
-The frontend runs on:
-
-- `http://localhost:5173`
-
-## Authentication notes
-
-- After login, the frontend stores the JWT in `localStorage` as `token`.
-- Routes like `/dashboard` and `/profile` are protected on the frontend.
+---
 
 ## Troubleshooting
 
-- If CORS blocks requests, ensure the frontend is running at `http://localhost:5173`.
-- Ensure MongoDB is running and `MONGODB_URL` is correct.
+- **CORS**: Ensure frontend is at `http://localhost:5173`.
+- **Database**: Ensure MongoDB is running and `MONGODB_URL` is correct.
