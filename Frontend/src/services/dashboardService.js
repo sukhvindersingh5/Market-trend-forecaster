@@ -54,40 +54,33 @@ function buildInsight(data, brands = [], backendInsight = "") {
 
 export async function getDashboardOverview(filters) {
   try {
-    // Primary sentiment data
-    const response = await axios.get(`${API_BASE_URL}/sentiment`, {
+    const sentimentReq = axios.get(`${API_BASE_URL}/sentiment`, {
       params: { product: filters.product, platform: filters.source }
     });
-    const data = response.data;
 
-    // Fetch brands for AI insight (non-blocking — fallback on error)
-    let brands = [];
-    let backendInsight = "";
-    try {
-      const brandsResp = await axios.get(`${API_BASE_URL}/sentiment/brands`);
-      brands = brandsResp.data.brands || [];
-      backendInsight = brandsResp.data.insight || "";
-    } catch { /* silent fallback */ }
+    const brandsReq = axios.get(`${API_BASE_URL}/sentiment/brands`)
+      .catch(() => ({ data: { brands: [], insight: "" } }));
 
-    // Live alerts — fetch top 4, fallback gracefully
-    let liveAlerts = [];
-    try {
-      const alertsResp = await axios.get(`${API_BASE_URL}/sentiment/alerts`);
-      liveAlerts = (alertsResp.data.alerts || [])
-        .slice(0, 4)
-        .map((a) => ({
-          level: SEV_LEVEL[a.severity] || "Low",
-          message: a.description || `${a.type} detected for ${a.product}`,
-          time: relativeTime(a.minutes_ago ?? 0),
-        }));
-    } catch {
-      liveAlerts = [
-        { level: "High", message: "Positive sentiment spike detected for Echo Dot", time: "12 minutes ago" },
-        { level: "Medium", message: "Mention volume surging across social platforms", time: "28 minutes ago" },
-        { level: "Medium", message: "Trending topic 'Sound Quality' gaining traction", time: "41 minutes ago" },
-        { level: "Low", message: "Brand risk signal detected for Nest Mini", time: "1 hour ago" },
-      ];
-    }
+    const alertsReq = axios.get(`${API_BASE_URL}/sentiment/alerts`)
+      .catch(() => ({ data: { alerts: [] } }));
+
+    const [sentimentResp, brandsResp, alertsResp] = await Promise.all([
+      sentimentReq,
+      brandsReq,
+      alertsReq
+    ]);
+
+    const data = sentimentResp.data;
+    const brands = brandsResp.data.brands || [];
+    const backendInsight = brandsResp.data.insight || "";
+
+    const liveAlerts = (alertsResp.data.alerts || [])
+      .slice(0, 4)
+      .map((a) => ({
+        level: SEV_LEVEL[a.severity] || "Low",
+        message: a.description || `${a.type} detected for ${a.product}`,
+        time: relativeTime(a.minutes_ago ?? 0),
+      }));
 
     return {
       summary: data.summary,
@@ -106,12 +99,12 @@ export async function getDashboardOverview(filters) {
       alerts: liveAlerts,
       summaryText: buildInsight(data, brands, backendInsight),
     };
+
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
     throw error;
   }
 }
-
 
 export async function getSentimentExplorerData(filters) {
   try {

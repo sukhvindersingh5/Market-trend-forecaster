@@ -6,8 +6,7 @@ class User(BaseModel):
     id: Optional[str] = None
     username: str
     email: str
-    name: Optional[str] = ""
-    joined_date: Optional[str] = ""
+    full_name: Optional[str] = None
     hashed_password: str
 
     class Config:

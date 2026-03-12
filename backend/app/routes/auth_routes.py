@@ -3,14 +3,15 @@ from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin, Token
 from app.utils.auth import get_password_hash, verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.database import users_collection
-from datetime import timedelta, datetime
+from datetime import timedelta
+
+router = APIRouter()
 
 @router.post("/signup", response_model=User)
 async def signup(user: UserCreate):
     # Trim inputs for consistency
     username = user.username.strip()
     email = user.email.strip().lower()
-    name = user.name.strip() if user.name else username
     
     existing_user = await users_collection.find_one({
         "$or": [
@@ -26,13 +27,12 @@ async def signup(user: UserCreate):
     user_dict = user.dict()
     user_dict["username"] = username
     user_dict["email"] = email
-    user_dict["name"] = name
-    user_dict["joined_date"] = datetime.now().strftime("%Y-%m-%d")
+    user_dict["full_name"] = user.full_name.strip() if user.full_name else None
     user_dict["hashed_password"] = hashed_password
     
     result = await users_collection.insert_one(user_dict)
     user_dict["id"] = str(result.inserted_id)
-    return User(**user_dict)
+    return user_dict
 
 @router.post("/login", response_model=Token)
 async def login(user: UserLogin):
@@ -51,6 +51,14 @@ async def login(user: UserLogin):
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(db_user["_id"])}, expires_delta=access_token_expires
+        data={"sub": db_user["username"]}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    
+    user_data = {
+        "id": str(db_user["_id"]),
+        "username": db_user["username"],
+        "email": db_user["email"],
+        "full_name": db_user.get("full_name")
+    }
+    
+    return {"access_token": access_token, "token_type": "bearer", "user": user_data}
