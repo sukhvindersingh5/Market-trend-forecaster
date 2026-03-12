@@ -34,8 +34,15 @@ async def update_user_profile(user_update: UserUpdate, current_user = Depends(ge
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
     
+    # If username is being updated, check for uniqueness
+    new_username = update_data.get("username")
+    if new_username and new_username != current_user["username"]:
+        existing_user = await users_collection.find_one({"username": new_username})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username is already taken")
+    
     await users_collection.update_one(
-        {"username": current_user["username"]},
+        {"_id": current_user["_id"]},
         {"$set": update_data}
     )
     return {"success": True, "message": "Profile updated successfully"}
