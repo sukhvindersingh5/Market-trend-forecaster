@@ -1,31 +1,64 @@
-# Market-trend-forecaster
+# MarketForecaster
 
-AI-Powered Market Trend & Consumer Sentiment Forecaster.
+> AI-powered consumer sentiment analysis and market trend forecasting dashboard for smart speaker products.
 
-## Overview
-
-MarketForecaster builds a multi-source data ingestion pipeline to collect consumer sentiment data for smart speaker products:
-- Amazon Alexa
-- Google Nest Mini
-- Apple HomePod Mini
-
-### Project Objective
-The platform aggregates social media posts, product reviews, and news data to generate consumer sentiment insights using LLM-based sentiment analysis, topic modeling, and RAG pipelines.
-
-### Data Ecosystem
-The dataset combines consumer opinions from multiple platforms:
-- **Amazon product reviews** (Kaggle dataset)
-- **YouTube comments** (YouTube Data API)
-- **News articles** (GNews API)
-- **Web-scraped product reviews** (Technology review websites)
+[![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue)](https://vitejs.dev/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green)](https://fastapi.tiangolo.com/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)](https://www.mongodb.com/)
 
 ---
 
-## Repository Structure
+## Overview
 
-- **Frontend**: React + Vite (`Frontend/`)
-- **Backend**: FastAPI + MongoDB (`backend/`)
-- **Data Ingestion**: Python scraping and cleaning scripts (`ingestion/` and `data/`)
+MarketForecaster aggregates consumer sentiment data from multiple sources — Amazon reviews, YouTube comments, news articles, and web-scraped product reviews — and presents AI-generated insights through an interactive dashboard.
+
+**Products tracked:**
+- Amazon Echo Dot
+- Google Nest Mini
+- Apple HomePod Mini
+
+**Key features:**
+- Real-time sentiment trend charts
+- Brand comparison analytics
+- AI-detected anomaly alerts
+- Sentiment Explorer with full-text search and filters
+- AI Insights card with trend summaries
+- User authentication (JWT)
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, Vite, Tailwind CSS |
+| Backend | FastAPI, Python 3.10+ |
+| Database | MongoDB (local or Atlas) |
+| Data sources | Amazon Kaggle dataset, YouTube Data API, GNews API, Crawl4AI web scraping |
+| Auth | JWT stored in localStorage |
+
+---
+
+## Project Structure
+
+```
+Market-trend-forecaster/
+├── Frontend/          # React + Vite app
+│   └── src/
+│       ├── pages/     # Dashboard, Alerts, Explorer, BrandComparison, Profile …
+│       ├── components/# DashboardLayout, Navbar, panel components
+│       ├── services/  # API calls (dashboardService, etc.)
+│       └── routes/    # AppRoutes.jsx
+├── backend/           # FastAPI server
+│   ├── app/
+│   │   ├── main.py
+│   │   └── routes/    # sentiment_routes.py, auth_routes.py …
+│   └── .env           # Environment variables (see below)
+├── ingestion/         # Data scraping and cleaning scripts
+└── data/              # Raw and processed datasets
+```
+
+---
 
 ## Getting Started
 
@@ -33,42 +66,96 @@ The dataset combines consumer opinions from multiple platforms:
 
 - **Node.js** 18+
 - **Python** 3.10+
-- **MongoDB** running locally or via Atlas
-
-### Backend (FastAPI)
-
-1. **Setup MongoDB**: The backend reads `MONGODB_URL` from `backend/.env`.
-2. **Create Venv**: `python -m venv backend/venv`
-3. **Install Dependencies**: `pip install -r backend/requirements.txt`
-4. **Configure Env**: Copy `backend/.env.example` to `backend/.env`.
-5. **Run Server**: 
-   ```bash
-   cd backend
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-   Open `http://localhost:8000/docs` for API documentation.
-
-### Frontend (React + Vite)
-
-1. **Install Dependencies**: `cd Frontend && npm install`
-2. **Start Dev Server**: `npm run dev`
-   Available at `http://localhost:5173`.
+- **MongoDB** running locally (`mongodb://localhost:27017`) or a MongoDB Atlas URI
 
 ---
 
-## Data Processing (Milestone 1)
+### 1 — Clone the repo
 
-The ingestion module performs:
-- Text cleaning (lowercase, noise removal)
-- Standardized schema alignment
-- Duplicate removal
-- Multi-source merging
+```bash
+git clone https://github.com/Prakhar1903/Market-trend-forecaster.git
+cd Market-trend-forecaster
+```
 
-**Final Dataset**: ~2,679 reviews/comments and 13 news articles across 3 products.
+---
+
+### 2 — Backend Setup (FastAPI)
+
+```bash
+# Create and activate virtual environment
+python -m venv backend/venv
+source backend/venv/bin/activate        # Windows: backend\venv\Scripts\activate
+
+# Install dependencies
+pip install -r backend/requirements.txt
+
+# Set up environment variables
+cp backend/.env.example backend/.env
+# Edit backend/.env and fill in your values (see below)
+
+# Start the server
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+API docs available at: **http://localhost:8000/docs**
+
+#### `backend/.env` variables
+
+```env
+MONGODB_URL=mongodb://localhost:27017
+DB_NAME=market_forecaster
+JWT_SECRET=your_secret_key_here
+```
+
+---
+
+### 3 — Frontend Setup (React + Vite)
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+App available at: **http://localhost:5173**
+
+> The frontend expects the backend running at `http://localhost:8000`.
+
+---
+
+## App Pages & Routes
+
+| Route | Page |
+|---|---|
+| `/` | Landing page |
+| `/login` | Login |
+| `/signup` | Sign up |
+| `/dashboard` | Overview (KPIs, trends, topics, alerts) |
+| `/dashboard/brands` | Brand Comparison |
+| `/dashboard/explorer` | Sentiment Explorer (search + filter) |
+| `/dashboard/alerts` | AI Alerts |
+| `/dashboard/reports` | Reports *(coming soon)* |
+| `/dashboard/chatbot` | AI Chatbot *(coming soon)* |
+| `/dashboard/profile` | User Profile |
 
 ---
 
 ## Troubleshooting
 
-- **CORS**: Ensure frontend is at `http://localhost:5173`.
-- **Database**: Ensure MongoDB is running and `MONGODB_URL` is correct.
+| Issue | Fix |
+|---|---|
+| CORS errors | Ensure frontend runs at `http://localhost:5173` |
+| Empty dashboard | Ensure MongoDB is running and `MONGODB_URL` is set correctly |
+| Login not working | Check `JWT_SECRET` is set in `backend/.env` |
+| Backend won't start | Run `pip install -r backend/requirements.txt` inside the venv |
+
+---
+
+## Data
+
+~2,679 reviews/comments across 3 products sourced from:
+- Amazon product reviews (Kaggle)
+- YouTube comments (YouTube Data API)
+- News articles (GNews API)
+- Web reviews (Crawl4AI scraping)
