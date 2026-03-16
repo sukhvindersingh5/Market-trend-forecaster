@@ -9,3 +9,5 @@ pandas
 requests
 beautifulsoup4
 crawl4ai
+httpx
+openpyxl

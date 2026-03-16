@@ -96,7 +96,8 @@ cp backend/.env.example backend/.env
 
 # Start the server
 cd backend
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+./venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# (Windows: .\venv\Scripts\uvicorn app.main:app --reload --host 0.0.0.0 --port 8000)
 ```
 
 API docs available at: **http://localhost:8000/docs**
@@ -149,6 +150,8 @@ App available at: **http://localhost:5173**
 |---|---|
 | CORS errors | Ensure frontend runs at `http://localhost:5173` |
 | Empty dashboard | Ensure MongoDB is running and `MONGODB_URL` is set correctly |
+| `ERR_CONNECTION_REFUSED` | Standardized Port is **8000**. Check all service files use this. |
+| `No module named 'openpyxl'` | Run `pip install -r backend/requirements.txt` to get report dependencies. |
 | Login not working | Check `JWT_SECRET` is set in `backend/.env` |
 | Backend won't start | Run `pip install -r backend/requirements.txt` inside the venv |
 
