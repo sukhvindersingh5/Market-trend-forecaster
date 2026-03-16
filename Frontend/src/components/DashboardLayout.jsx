@@ -43,13 +43,13 @@ const DashboardLayout = () => {
     <div className="h-screen overflow-hidden bg-slate-950 flex flex-col">
 
       {/* ── Top Header ──────────────────────────────────────────────────── */}
-      <header className="h-16 flex-shrink-0 flex items-center justify-between px-6 bg-slate-900/70 backdrop-blur-xl border-b border-white/10 z-40">
+      <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-slate-900/70 backdrop-blur-xl border-b border-white/10 z-40">
 
         {/* Left — brand + page title */}
         <div className="flex items-center gap-6">
           {/* Logo / brand */}
-          <div className="flex items-center gap-2.5 flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-sm font-black text-white shadow-[0_0_16px_rgba(56,189,248,0.4)]">
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-secondary flex items-center justify-center text-sm font-black text-white shadow-[0_0_16px_rgba(56,189,248,0.4)]">
               M
             </div>
             <span className="text-base font-black text-gradient tracking-tight hidden sm:block">
@@ -108,7 +108,7 @@ const DashboardLayout = () => {
       <div className="flex flex-1 overflow-hidden">
 
         {/* Sidebar */}
-        <aside className="w-60 flex-shrink-0 bg-slate-900/30 border-r border-white/10 p-4 flex flex-col gap-1 overflow-y-auto">
+        <aside className="w-60 shrink-0 bg-slate-900/30 border-r border-white/10 p-4 flex flex-col gap-1 overflow-y-auto">
           {NAV_ITEMS.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -125,7 +125,7 @@ const DashboardLayout = () => {
                 </span>
                 <span className="font-medium text-sm truncate">{item.label}</span>
                 {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                 )}
               </button>
             );
@@ -133,7 +133,7 @@ const DashboardLayout = () => {
 
           {/* Sidebar footer — version badge */}
           <div className="mt-auto pt-4 border-t border-white/5">
-            <div className="px-4 py-2 rounded-xl bg-white/[0.02] border border-white/5">
+            <div className="px-4 py-2 rounded-xl bg-white/2 border border-white/5">
               <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">MarketForecaster</p>
               <p className="text-[10px] text-slate-700 mt-0.5">v0.1 · Beta</p>
             </div>
