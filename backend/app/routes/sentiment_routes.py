@@ -155,6 +155,20 @@ async def get_sentiment(
             "news": "News Articles",
             "web": "Review Sites"
         }
+        # AI Narrative Generation
+        product_name = mapped_product if mapped_product != "all" else "market-wide"
+        platform_name = mapped_platform if mapped_platform != "all" else "all sources"
+        
+        sentiment_word = "positive" if avg_sentiment > 0.1 else "negative" if avg_sentiment < -0.1 else "neutral"
+        top_topic = topics[0]['name'] if topics else "general usage"
+        
+        summary_text = (
+            f"Currently seeing {sentiment_word} sentiment ({avg_sentiment:+.2f}) for "
+            f"{product_name} across {platform_name}. "
+            f"The conversation is primarily focused on {top_topic}, "
+            f"with {total_mentions} total mentions analyzed in this period."
+        )
+
         readable_platform_breakdown = {}
         for p_id, count in platform_breakdown.items():
             readable_name = READABLE_PLATFORM_MAP.get(p_id, p_id.title())
@@ -169,6 +183,7 @@ async def get_sentiment(
                 "neutralPct": neu_pct,
                 "activeAlerts": 2
             },
+            "summaryText": summary_text,
             "recent_data": recent,
             "topics": topics,
             "trend_comparison": trend_comparison,
