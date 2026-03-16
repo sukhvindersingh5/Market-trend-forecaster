@@ -18,10 +18,10 @@ const LandingPage = () => {
       <main className="pt-32">
         {/* HERO SECTION */}
         <section className="relative py-40 px-8 text-center max-w-7xl mx-auto overflow-hidden text-white">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/20 blur-[150px] rounded-full -z-10"></div>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-200 bg-primary/20 blur-[150px] rounded-full -z-10"></div>
 
           <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tight">
-            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
               Predict Market Trends
             </span>
             <br />
@@ -42,7 +42,7 @@ const LandingPage = () => {
             </button>
 
             <button
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate(isLoggedIn ? "/dashboard" : "/signup")}
               className="px-10 py-5 border border-white/10 hover:border-primary/50 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 text-slate-300 hover:text-white font-bold"
             >
               Get Started
@@ -125,7 +125,7 @@ const LandingPage = () => {
         </section>
 
         {/* CTA */}
-        <section className="py-40 text-center bg-gradient-to-b from-slate-950 to-slate-900 border-t border-white/5 relative overflow-hidden">
+        <section className="py-40 text-center bg-linear-to-b from-slate-950 to-slate-900 border-t border-white/5 relative overflow-hidden">
           <div className="absolute inset-0 bg-primary/5 opacity-30 pointer-events-none" />
           <h2 className="text-5xl md:text-7xl font-black mb-14 text-white relative z-10">
             Ready for <span className="text-primary">Market Insights?</span>
