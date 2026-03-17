@@ -19,11 +19,29 @@ const Login = () => {
       alert(error.response?.data?.detail || "Login failed");
     }
   };
+    const handleBack = () => {
+    navigate("/");  // Goes to home page
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 blur-[120px] rounded-full pointer-events-none" />
+
+{/* Back Button */}
+<button
+  onClick={handleBack}
+  className="absolute top-8 left-8 glass-card p-3 rounded-2xl shadow-2xl backdrop-blur-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105 z-20 flex items-center gap-2 text-slate-200 hover:text-white"
+  aria-label="Back to home"
+>
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+  <span className="font-medium text-sm hidden md:inline">Back</span>
+</button>
+
+
+
 
       <div className="glass-card p-10 w-full max-auto max-w-md relative z-10">
         <h2 className="text-3xl font-black text-slate-100 mb-2">Welcome Back</h2>

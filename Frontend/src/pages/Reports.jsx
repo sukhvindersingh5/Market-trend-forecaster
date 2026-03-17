@@ -57,18 +57,18 @@ const Reports = () => {
     }
   };
 
-  const handlePresetClick = (preset) => {
-    setDateRange(preset);
-    if (preset === "custom") return;
+ const handlePresetClick = (preset) => {
+  setDateRange(preset);
+  
+  const end = new Date();
+  const start = new Date();
+  const days = preset === "7d" ? 7 : preset === "30d" ? 30 : 90;
+  start.setDate(end.getDate() - days);
 
-    const end = new Date();
-    const start = new Date();
-    const days = preset === "7d" ? 7 : preset === "30d" ? 30 : 90;
-    start.setDate(end.getDate() - days);
+  setFromDate(start.toISOString().split("T")[0]);
+  setToDate(end.toISOString().split("T")[0]);
+};
 
-    setFromDate(start.toISOString().split("T")[0]);
-    setToDate(end.toISOString().split("T")[0]);
-  };
 
   const handleDownload = async (type, format) => {
     try {
@@ -146,7 +146,7 @@ const Reports = () => {
 
       {/* ADVANCED FILTER BAR */}
       <div className="glass-card mb-8 p-6 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-1px bg-linear-to-r from-transparent via-blue-500/30 to-transparent" />
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
           <div className="flex flex-col gap-2">
@@ -196,7 +196,7 @@ const Reports = () => {
                 <DatePresetCard label="7D" active={dateRange === "7d"} onClick={() => handlePresetClick("7d")} />
                 <DatePresetCard label="30D" active={dateRange === "30d"} onClick={() => handlePresetClick("30d")} />
                 <DatePresetCard label="90D" active={dateRange === "90d"} onClick={() => handlePresetClick("90d")} />
-                <DatePresetCard label="Custom" active={dateRange === "custom"} onClick={() => handlePresetClick("custom")} />
+               
               </div>
             </div>
 
@@ -283,7 +283,7 @@ const Reports = () => {
 
       {/* REPORT PREVIEW MODAL */}
       {previewReport && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300" onClick={closePreview} />
 
           <div className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">

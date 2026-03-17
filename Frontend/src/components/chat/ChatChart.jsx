@@ -9,7 +9,7 @@ import {
  */
 const ChatChart = ({ data, title }) => {
     return (
-        <div className="bg-slate-900/40 border border-white/10 rounded-2xl p-4 my-4 h-[300px] w-full min-w-[300px] shadow-inner backdrop-blur-sm">
+        <div className="bg-slate-900/40 border border-white/10 rounded-2xl p-4 my-4 h-75 w-full min-w-75 shadow-inner backdrop-blur-sm">
             {title && <h4 className="text-white text-sm font-semibold mb-4 text-center">{title}</h4>}
             <ResponsiveContainer width="100%" height="85%">
                 <BarChart data={data}>

@@ -312,7 +312,7 @@ const AIChatbot = () => {
         </div>
 
         <div className="chatbot-input-container p-6 w-full">
-          <div className="max-w-[850px] mx-auto relative">
+          <div className="max-w-212.5 mx-auto relative">
             {currentChat?.messages.length <= 1 && !input && (
               <SuggestedPrompts onSelect={(text) => sendMessage(text)} />
             )}

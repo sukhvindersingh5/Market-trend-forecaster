@@ -15,9 +15,9 @@ const LandingPage = () => {
     <div className="bg-slate-950 min-h-screen text-white font-inter">
       <Navbar />
 
-      <main className="pt-32">
+      <main className="pt-22">
         {/* HERO SECTION */}
-        <section className="relative py-40 px-8 text-center max-w-7xl mx-auto overflow-hidden text-white">
+        <section className="relative py-20 px-8 text-center max-w-7xl mx-auto overflow-hidden text-white">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-200 bg-primary/20 blur-[150px] rounded-full -z-10"></div>
 
           <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tight">
@@ -28,7 +28,7 @@ const LandingPage = () => {
             Before They Happen
           </h1>
 
-          <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto mb-16 leading-relaxed">
+          <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto mb-6 leading-relaxed">
             AI powered consumer sentiment analysis and trend forecasting
             to help businesses understand what customers want next.
           </p>
@@ -50,7 +50,7 @@ const LandingPage = () => {
           </div>
 
           {/* STATS */}
-          <div className="flex justify-center gap-16 mt-24 flex-wrap">
+          <div className="flex justify-center gap-16 mt-20 flex-wrap">
             <div className="text-center">
               <h3 className="text-5xl font-black text-primary drop-shadow-[0_0_20px_rgba(56,189,248,0.4)]">12K+</h3>
               <p className="text-slate-500 font-bold tracking-widest uppercase text-xs mt-3">Reviews Analyzed</p>
