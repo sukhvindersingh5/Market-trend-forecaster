@@ -14,7 +14,7 @@ const Login = () => {
       const data = await login({ username: username.trim(), password });
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      navigate("/");
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       alert(error.response?.data?.detail || "Login failed");
     }
