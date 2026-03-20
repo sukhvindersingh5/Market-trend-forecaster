@@ -8,7 +8,13 @@ import Profile from "../pages/Profile";
 import BrandComparison from "../pages/BrandComparison";
 import SentimentExplorer from "../pages/SentimentExplorer";
 import Alerts from "../pages/Alerts";
+
 import Reports from "../pages/Reports";
+
+import Reports from "../pages/Reports";  
+
+import FutureTrends from "../pages/FutureTrends";
+
 import AIChatbot from "../pages/AIChatbot";
 
 import DashboardLayout from "../components/DashboardLayout";
@@ -36,6 +42,9 @@ const AppRoutes = () => {
         <Route path="alerts" element={<Alerts />} />                      {/* /dashboard/alerts   */}
         <Route path="profile" element={<Profile />} />                     {/* /dashboard/profile  */}
         <Route path="reports" element={<Reports />} />          {/* /dashboard/reports  */}
+
+<Route path="future-trends" element={<FutureTrends />} />
+
         <Route path="chatbot" element={<AIChatbot />} />          {/* /dashboard/chatbot  */}
       </Route>
     </Routes>
