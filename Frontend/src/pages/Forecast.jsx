@@ -79,35 +79,6 @@ const WarCard = ({ brand, index }) => {
     );
 };
 
-// ── SVG Gauge ─────────────────────────────────────────────────────
-const RiskGauge = ({ brand }) => {
-    const color = brand.risk.color;
-    const size = 110;
-    const r = 38;
-    const cx = size / 2;
-    const cy = size / 2;
-    const circumference = 2 * Math.PI * r;
-    const arcLength = circumference * 0.65;
-    const fillRatio = brand.confidence / 100;
-    const filled = fillRatio * arcLength;
-
-    return (
-        <div className="gauge-container">
-            <svg width={size} height={size} className="gauge-svg" style={{ transform: "rotate(126deg)" }}>
-                <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={10}
-                    strokeDasharray={`${arcLength} ${circumference}`} strokeLinecap="round" />
-                <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={10}
-                    strokeDasharray={`${filled} ${circumference}`} strokeLinecap="round"
-                    style={{ transition: "stroke-dasharray 1.5s cubic-bezier(0.4,0,0.2,1)" }} />
-            </svg>
-            <div className="text-center -mt-2">
-                <div className="text-lg font-black text-white">{brand.confidence}%</div>
-                <div className="text-xs font-bold" style={{ color }}>{brand.risk.emoji} {brand.risk.label}</div>
-                <div className="text-xs text-slate-500 mt-1">{brand.name}</div>
-            </div>
-        </div>
-    );
-};
 
 // ── Forecast Chart with animated draw ─────────────────────────────
 const ForecastChart = ({ data, brandColors, todayDate }) => {
@@ -154,7 +125,7 @@ const ForecastChart = ({ data, brandColors, todayDate }) => {
     );
 };
 
-// ── What Could Change Factor Card ──────────────────────────────────
+// ── Factor Card ─────────────────────────────────────────────────────
 const FactorCard = ({ factor, type }) => {
     const [open, setOpen] = useState(false);
     const [barWidth, setBarWidth] = useState(0);
@@ -165,37 +136,55 @@ const FactorCard = ({ factor, type }) => {
     }, [factor.probability]);
 
     const isPositive = type === "driver" ? factor.impact === "positive" : factor.impact_pct > 0;
-    const color = isPositive ? "#10b981" : type === "driver" && factor.impact === "neutral" ? "#f59e0b" : "#ef4444";
+    const isNeutral = type === "driver" && factor.impact === "neutral";
+    const color = isNeutral ? "#f59e0b" : isPositive ? "#10b981" : "#ef4444";
+
+    const impactLabel = type === "risk"
+        ? (factor.impact_pct > 0 ? `+${factor.impact_pct}% impact` : `${factor.impact_pct}% impact`)
+        : (isNeutral ? "Neutral impact" : isPositive ? "Positive impact" : "Negative impact");
+
+    const impactIcon = isNeutral ? "〜" : isPositive ? "↑" : "↓";
 
     return (
-        <div className="factor-card bg-slate-900/40">
+        <div className="rounded-xl overflow-hidden border border-white/5 hover:border-white/10 transition-all bg-slate-900/40"
+            style={{ borderLeft: `3px solid ${color}` }}>
             <button
-                className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors"
+                className="w-full flex items-center gap-4 p-4 text-left hover:bg-white/5 transition-colors"
                 onClick={() => setOpen(!open)}
             >
-                <div className="flex items-center gap-3">
-                    <span className="text-lg">{isPositive ? "📈" : type === "driver" && factor.impact === "neutral" ? "📰" : "⚠️"}</span>
-                    <div>
-                        <div className="text-sm font-semibold text-white">{factor.factor}</div>
-                        <div className="text-xs text-slate-500">{factor.probability}% probability</div>
-                    </div>
+                {/* Impact icon */}
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-base font-black"
+                    style={{ background: color + "20", color }}>
+                    {impactIcon}
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold" style={{ color }}>
-                        {type === "risk" && factor.impact_pct > 0 ? "+" : ""}
-                        {type === "risk" ? `${factor.impact_pct}%` : factor.impact === "positive" ? "Positive" : "Neutral"}
-                    </span>
-                    {open ? <ChevronUp size={14} className="text-slate-500" /> : <ChevronDown size={14} className="text-slate-500" />}
+
+                {/* Name + probability */}
+                <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-white truncate">{factor.factor}</div>
+                    <div className="text-xs text-slate-500 mt-0.5">{factor.probability}% chance this matters</div>
                 </div>
+
+                {/* Impact badge */}
+                <span className="text-xs font-bold px-2.5 py-1 rounded-lg flex-shrink-0"
+                    style={{ background: color + "18", color, border: `1px solid ${color}30` }}>
+                    {impactLabel}
+                </span>
+
+                {open ? <ChevronUp size={14} className="text-slate-500 flex-shrink-0" />
+                    : <ChevronDown size={14} className="text-slate-500 flex-shrink-0" />}
             </button>
 
             {open && (
-                <div className="px-4 pb-4 text-sm text-slate-400 border-t border-white/5 pt-3">
-                    {factor.detail}
-                    <div className="factor-bar-track mt-3">
-                        <div className="factor-bar-fill" style={{ width: `${barWidth}%`, background: color }} />
+                <div className="px-4 pb-4 border-t border-white/5 pt-3">
+                    <p className="text-sm text-slate-400 leading-relaxed">{factor.detail}</p>
+                    <div className="mt-3">
+                        <div className="flex justify-between text-xs text-slate-500 mb-1">
+                            <span>Probability</span><span style={{ color }}>{factor.probability}%</span>
+                        </div>
+                        <div className="factor-bar-track">
+                            <div className="factor-bar-fill" style={{ width: `${barWidth}%`, background: color }} />
+                        </div>
                     </div>
-                    <div className="text-xs text-slate-500 mt-1">Probability: {factor.probability}%</div>
                 </div>
             )}
         </div>
@@ -246,6 +235,10 @@ const Forecast = () => {
 
     const handleHorizonChange = (val) => {
         setHorizon(val);
+        // Only update the label while dragging — API fetch happens on release
+    };
+
+    const handleSliderRelease = (val) => {
         fetchForecast(val);
     };
 
@@ -310,29 +303,6 @@ const Forecast = () => {
                 </div>
             </div>
 
-            {/* ── Section 2: RISK METER ──────────────────────────────────── */}
-            <div className="glass-card p-6">
-                <div className="flex items-center gap-2 mb-6">
-                    <AlertTriangle size={18} className="text-amber-400" />
-                    <h2 className="text-lg font-black text-white tracking-tight">Forecast Risk Meter</h2>
-                    <div className="ml-auto flex gap-4 text-xs text-slate-500">
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />Safe</span>
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />Volatile</span>
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500 inline-block" />Warning</span>
-                    </div>
-                </div>
-                <div className="grid grid-cols-3 gap-6">
-                    {data.brands.map((brand) => (
-                        <div key={brand.id} className="bg-slate-900/40 border border-white/5 rounded-2xl p-5 flex flex-col items-center gap-2">
-                            <RiskGauge brand={brand} />
-                            <div className="text-xs text-slate-400 text-center mt-1">
-                                {brand.direction === "GAINING" ? "Confident upward trend" :
-                                    brand.direction === "LOSING" ? "Declining trajectory" : "Stable, low momentum"}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
 
             {/* ── Section 3: TIME MACHINE ────────────────────────────────── */}
             <div className="glass-card p-6">
@@ -348,13 +318,15 @@ const Forecast = () => {
                 <div className="flex items-center gap-4 mb-4 px-2">
                     {horizonLabels.map((h) => (
                         <span key={h} className={`text-xs font-bold cursor-pointer transition-colors ${horizon === h ? "text-blue-400" : "text-slate-600 hover:text-slate-400"}`}
-                            onClick={() => handleHorizonChange(h)}>+{h}d</span>
+                            onClick={() => { setHorizon(h); fetchForecast(h); }}>+{h}d</span>
                     ))}
                 </div>
 
                 <input type="range" min="7" max="90" step="1" value={horizon}
                     className="time-slider mb-6"
-                    onChange={(e) => handleHorizonChange(Number(e.target.value))} />
+                    onChange={(e) => handleHorizonChange(Number(e.target.value))}
+                    onMouseUp={(e) => handleSliderRelease(Number(e.target.value))}
+                    onPointerUp={(e) => handleSliderRelease(Number(e.target.value))} />
 
                 <ForecastChart data={chartData} brandColors={brandColorList} todayDate={todayRef.current} />
 
@@ -402,30 +374,39 @@ const Forecast = () => {
                 </div>
             </div>
 
-            {/* ── Sections 5 & 6 side-by-side ──────────────────────────────── */}
+            {/* ── Sections 5 & 6: Drivers + Risk Factors ────────────────── */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* Section 5: Key Drivers */}
                 <div className="glass-card p-6">
-                    <div className="flex items-center gap-2 mb-5">
-                        <TrendingUp size={16} className="text-emerald-400" />
-                        <h2 className="text-base font-black text-white tracking-tight">Key Drivers</h2>
-                        <span className="text-xs text-slate-500 ml-1">— what's shaping the forecast</span>
+                    <div className="flex items-start gap-3 mb-5">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                            <TrendingUp size={18} className="text-emerald-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-base font-black text-white tracking-tight">Why This Forecast is Trending This Way</h2>
+                            <p className="text-xs text-slate-500 mt-0.5">Signals currently pushing sentiment in this direction</p>
+                        </div>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         {(data.drivers || []).map((d, i) => (
                             <FactorCard key={i} factor={d} type="driver" />
                         ))}
                     </div>
                 </div>
 
-                {/* Section 6: What Could Change This */}
+                {/* Section 6: What Could Change */}
                 <div className="glass-card p-6">
-                    <div className="flex items-center gap-2 mb-5">
-                        <Info size={16} className="text-blue-400" />
-                        <h2 className="text-base font-black text-white tracking-tight">What Could Change This?</h2>
+                    <div className="flex items-start gap-3 mb-5">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                            <AlertTriangle size={18} className="text-blue-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-base font-black text-white tracking-tight">Events That Could Flip This Forecast</h2>
+                            <p className="text-xs text-slate-500 mt-0.5">External shocks that might invalidate the current prediction</p>
+                        </div>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         {(data.risk_factors || []).map((f, i) => (
                             <FactorCard key={i} factor={f} type="risk" />
                         ))}
