@@ -8,11 +8,7 @@ import Profile from "../pages/Profile";
 import BrandComparison from "../pages/BrandComparison";
 import SentimentExplorer from "../pages/SentimentExplorer";
 import Alerts from "../pages/Alerts";
-
 import Reports from "../pages/Reports";
-
-import Reports from "../pages/Reports";  
-
 import FutureTrends from "../pages/FutureTrends";
 
 import AIChatbot from "../pages/AIChatbot";
