@@ -23,7 +23,8 @@ MarketForecaster aggregates consumer sentiment data from multiple sources — Am
 - AI-detected anomaly alerts with live feed
 - Sentiment Explorer with full-text search and faceted filters
 - **Live AI Chatbot**: High-fidelity market consultant with markdown support and persona tuning
-- AI Insights card with automated trend narratives
+- **Premium Reports**: Exportable PDF/Excel intelligence with dynamic charts and AI insights
+- **Intelligent Profile**: Progress tracking, image uploads (Avatar/Banner), and Quick Actions
 - User authentication (JWT)
 
 ---
@@ -46,17 +47,18 @@ MarketForecaster aggregates consumer sentiment data from multiple sources — Am
 Market-trend-forecaster/
 ├── Frontend/          # React + Vite app
 │   └── src/
-│       ├── pages/     # Dashboard, Alerts, Explorer, BrandComparison, Profile …
-│       ├── components/# DashboardLayout, Navbar, panel components
-│       ├── services/  # API calls (dashboardService, etc.)
-│       └── routes/    # AppRoutes.jsx
+│       ├── pages/     # Dashboard, Reports, Chatbot, Profile ...
+│       ├── components/# Shared UI & Layout components
+│       ├── services/  # API services (auth, reports, dashboard)
+│       └── routes/    # App routing
 ├── backend/           # FastAPI server
 │   ├── app/
-│   │   ├── main.py
-│   │   └── routes/    # sentiment_routes.py, auth_routes.py …
-│   └── .env           # Environment variables (see below)
-├── ingestion/         # Data scraping and cleaning scripts
-└── data/              # Raw and processed datasets
+│   │   ├── routes/    # API endpoints (reports, user, auth)
+│   │   ├── static/    # User uploads (avatars, banners)
+│   │   └── main.py
+│   └── .env           # Environment variables
+├── ingestion/         # Data ingestion pipelines
+└── data/              # Datasets
 ```
 
 ---

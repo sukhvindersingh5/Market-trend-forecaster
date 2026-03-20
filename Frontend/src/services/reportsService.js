@@ -41,3 +41,16 @@ export async function generateReport({
   link.remove();
   window.URL.revokeObjectURL(url);
 }
+
+export async function getReportPreview({ type, brand, channel, fromDate, toDate }) {
+  const params = {
+    type,
+    brand,
+    channel,
+    from: fromDate || undefined,
+    to: toDate || undefined,
+  };
+
+  const response = await httpClient.get("/api/reports/preview", { params });
+  return response.data;
+}

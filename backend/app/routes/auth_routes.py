@@ -32,6 +32,8 @@ async def signup(user: UserCreate):
     
     result = await users_collection.insert_one(user_dict)
     user_dict["id"] = str(result.inserted_id)
+    user_dict["avatar_url"] = None
+    user_dict["banner_url"] = None
     return user_dict
 
 @router.post("/login", response_model=Token)
@@ -58,7 +60,9 @@ async def login(user: UserLogin):
         "id": str(db_user["_id"]),
         "username": db_user["username"],
         "email": db_user["email"],
-        "full_name": db_user.get("full_name")
+        "full_name": db_user.get("full_name"),
+        "avatar_url": db_user.get("avatar_url"),
+        "banner_url": db_user.get("banner_url")
     }
     
     return {"access_token": access_token, "token_type": "bearer", "user": user_data}

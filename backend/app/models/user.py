@@ -7,6 +7,8 @@ class User(BaseModel):
     username: str
     email: str
     full_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    banner_url: Optional[str] = None
     hashed_password: str
 
     class Config:
