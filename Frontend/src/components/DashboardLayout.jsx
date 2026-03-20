@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { id: 'alerts', label: 'Alerts', icon: '🔔', path: '/dashboard/alerts' },
   { id: 'reports', label: 'Reports', icon: '📋', path: '/dashboard/reports' },
   { id: 'chatbot', label: 'AI Chatbot', icon: '🤖', path: '/dashboard/chatbot' },
+  { id: 'forecast', label: 'Forecast', icon: '🔮', path: '/dashboard/forecast' },
 ];
 
 // ── Page meta derived from current path ───────────────────────────────────
@@ -28,6 +29,7 @@ const PAGE_META = {
   '/dashboard/alerts': { title: 'Alerts', subtitle: 'AI-detected anomalies and market signals' },
   '/dashboard/reports': { title: 'Reports', subtitle: 'Export and schedule AI-generated reports' },
   '/dashboard/chatbot': { title: 'AI Chatbot', subtitle: 'Ask market questions in natural language' },
+  '/dashboard/forecast': { title: 'Market Forecast', subtitle: 'AI-powered sentiment predictions & brand intelligence' },
   '/dashboard/profile': { title: 'Your Profile', subtitle: 'Manage your account and preferences' },
 };
 
