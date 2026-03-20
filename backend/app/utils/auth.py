@@ -13,7 +13,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("JWT_SECRET", "fallback-secret-key-for-dev-only")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

@@ -12,6 +12,8 @@ class UserOut(BaseModel):
     username: str
     email: str
     full_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    banner_url: Optional[str] = None
 
 class UserLogin(BaseModel):
     username: str
@@ -24,3 +26,13 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    full_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    banner_url: Optional[str] = None
+
+class PasswordUpdate(BaseModel):
+    current_password: str
+    new_password: str

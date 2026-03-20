@@ -8,7 +8,7 @@ import Profile from "../pages/Profile";
 import BrandComparison from "../pages/BrandComparison";
 import SentimentExplorer from "../pages/SentimentExplorer";
 import Alerts from "../pages/Alerts";
-import Reports from "../pages/Reports";  
+import Reports from "../pages/Reports";
 import AIChatbot from "../pages/AIChatbot";
 
 import DashboardLayout from "../components/DashboardLayout";

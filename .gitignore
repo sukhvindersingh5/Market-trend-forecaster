@@ -36,3 +36,7 @@ Thumbs.db
 
 # Debug / temp scripts
 reproduce_issue.py
+
+# User Uploads
+backend/app/static/uploads/*
+!backend/app/static/uploads/.gitkeep

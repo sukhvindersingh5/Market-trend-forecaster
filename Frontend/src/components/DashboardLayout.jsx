@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { MessageSquare } from 'lucide-react';
+import { getProfile } from '../services/authService';
+
+const getAILabel = (pathname) => {
+  if (pathname.includes("reports")) return "Ask AI about reports";
+  if (pathname.includes("explorer")) return "Analyze sentiment";
+  if (pathname.includes("brands")) return "Compare brands";
+  return "Ask AI";
+};
 
 // ── Sidebar nav items ──────────────────────────────────────────────────────
 const NAV_ITEMS = [
@@ -37,7 +46,20 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const lastUpdated = useLastUpdated();
+  const [profile, setProfile] = useState(null);
   const meta = PAGE_META[location.pathname] || { title: 'Dashboard', subtitle: '' };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+        setProfile(data);
+      } catch (error) {
+        console.error("Failed to fetch profile in layout", error);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   return (
     <div className="h-screen overflow-hidden bg-slate-950 flex flex-col">
@@ -91,15 +113,19 @@ const DashboardLayout = () => {
           <button
             type="button"
             onClick={() => navigate('/dashboard/profile')}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer border ${location.pathname === '/dashboard/profile'
-                ? 'bg-primary/20 border-primary/40 text-primary'
-                : 'bg-slate-800 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50'
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer border overflow-hidden ${location.pathname === '/dashboard/profile'
+              ? 'bg-primary/20 border-primary/40 text-primary'
+              : 'bg-slate-800 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50'
               }`}
             aria-label="Profile"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" fill="currentColor" />
-            </svg>
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" fill="currentColor" />
+              </svg>
+            )}
           </button>
         </div>
       </header>
@@ -115,8 +141,8 @@ const DashboardLayout = () => {
               <button
                 key={item.id}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer text-left w-full ${isActive
-                    ? 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_20px_rgba(56,189,248,0.08)]'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
+                  ? 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_20px_rgba(56,189,248,0.08)]'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
                   }`}
                 onClick={() => navigate(item.path)}
               >
@@ -147,6 +173,30 @@ const DashboardLayout = () => {
           </div>
         </main>
       </div>
+
+      {/* ── Floating AI FAB ──────────────────────────────────── */}
+      {location.pathname !== '/dashboard/chatbot' && (
+        <div className="group fixed bottom-6 right-6 z-50">
+          {/* Glow Effect */}
+          <div className="absolute inset-0 rounded-full bg-primary/40 blur-xl opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-500"></div>
+
+          {/* Tooltip */}
+          <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-slate-900/90 backdrop-blur-md border border-white/10 text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-2xl">
+            Open AI Assistant
+          </div>
+
+          <button
+            onClick={() => navigate("/dashboard/chatbot")}
+            className="relative flex items-center gap-2 px-5 py-3 rounded-full bg-linear-to-r from-primary to-secondary text-white font-bold text-sm shadow-[0_8px_32px_rgba(56,189,248,0.4)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden border border-white/20"
+          >
+            <span className="text-base">⚡</span>
+            <span>{getAILabel(location.pathname)}</span>
+
+            {/* Notification Indicator */}
+            <span className="absolute top-1 right-2 w-2.5 h-2.5 bg-accent rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

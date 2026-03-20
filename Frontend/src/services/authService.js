@@ -23,13 +23,14 @@ export const getProfile = async () => {
   const userData = response.data;
 
   // Return consistent structure for the UI
-  // Note: statistics and joinedDate are still mocked for now as backend doesn't track them yet
   return {
     name: userData.full_name || userData.username,
     username: userData.username,
     email: userData.email,
-    joinedDate: "2024-01-15", // Mocked
-    stats: {
+    avatar_url: userData.avatar_url,
+    banner_url: userData.banner_url,
+    joinedDate: userData.joinedDate || "2024-01-15",
+    stats: userData.stats || {
       forecasts: 42,
       accuracy: "89%",
       lastLogin: "2 hours ago"
@@ -51,7 +52,35 @@ export const updateProfile = async (profileData) => {
   return response.data;
 };
 
-export const updatePassword = () => {
-  // Mock update
-  return { success: true };
+export const updatePassword = async (passwordData) => {
+  const response = await axios.put(`http://localhost:8000/users/password`, passwordData, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
+  return response.data;
+};
+
+export const uploadAvatar = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await axios.post(`http://localhost:8000/users/upload-avatar`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
+  return response.data;
+};
+
+export const uploadBanner = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await axios.post(`http://localhost:8000/users/upload-banner`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
+  return response.data;
 };
