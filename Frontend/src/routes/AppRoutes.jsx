@@ -9,7 +9,6 @@ import BrandComparison from "../pages/BrandComparison";
 import SentimentExplorer from "../pages/SentimentExplorer";
 import Alerts from "../pages/Alerts";
 import Reports from "../pages/Reports";
-import FutureTrends from "../pages/FutureTrends";
 
 import AIChatbot from "../pages/AIChatbot";
 import Forecast from "../pages/Forecast";
@@ -40,7 +39,7 @@ const AppRoutes = () => {
         <Route path="profile" element={<Profile />} />                     {/* /dashboard/profile  */}
         <Route path="reports" element={<Reports />} />          {/* /dashboard/reports  */}
 
-<Route path="future-trends" element={<FutureTrends />} />
+
 
         <Route path="chatbot" element={<AIChatbot />} />          {/* /dashboard/chatbot  */}
         <Route path="forecast" element={<Forecast />} />          {/* /dashboard/forecast */}

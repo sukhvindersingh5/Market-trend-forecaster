@@ -1,5 +1,5 @@
 // src/pages/Forecast.jsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useCallback } from "react";
 import "../styles/forecast.css";
 import {
     ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid,
@@ -17,6 +17,22 @@ const BRAND_COLORS = {
     "nest-mini": { solid: "#10b981", light: "rgba(16,185,129,0.15)" },
     "homepod-mini": { solid: "#8b5cf6", light: "rgba(139,92,246,0.15)" },
 };
+
+ const CustomTooltip = ({ active, payload, label }) => {
+        if (!active || !payload?.length) return null;
+        return (
+            <div className="bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-xs shadow-xl">
+                <div className="text-slate-400 mb-1">{label}</div>
+                {payload.map((p, i) => p.value != null && (
+                    <div key={i} className="flex items-center gap-2" style={{ color: p.color }}>
+                        <span className="font-bold">{p.name}:</span>
+                        <span>{(p.value * 100).toFixed(1)}%</span>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
 
 // ── Helper: format sentiment as percentage ─────────────────────────
 const fmtPct = (v) => `${(v * 100).toFixed(1)}%`;
@@ -84,21 +100,7 @@ const WarCard = ({ brand, index }) => {
 const ForecastChart = ({ data, brandColors, todayDate }) => {
     if (!data || data.length === 0) return null;
 
-    const CustomTooltip = ({ active, payload, label }) => {
-        if (!active || !payload?.length) return null;
-        return (
-            <div className="bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-xs shadow-xl">
-                <div className="text-slate-400 mb-1">{label}</div>
-                {payload.map((p, i) => p.value != null && (
-                    <div key={i} className="flex items-center gap-2" style={{ color: p.color }}>
-                        <span className="font-bold">{p.name}:</span>
-                        <span>{(p.value * 100).toFixed(1)}%</span>
-                    </div>
-                ))}
-            </div>
-        );
-    };
-
+   
     return (
         <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
@@ -107,7 +109,7 @@ const ForecastChart = ({ data, brandColors, todayDate }) => {
                     tickFormatter={(d) => d?.slice(5)} interval={Math.floor(data.length / 6)} />
                 <YAxis tick={{ fill: "#64748b", fontSize: 10 }}
                     tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} domain={["auto", "auto"]} />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={CustomTooltip } />
                 <ReferenceLine x={todayDate} stroke="#3b82f6" strokeDasharray="4 4"
                     label={{ value: "Today", fill: "#3b82f6", fontSize: 10, position: "top" }} />
 
@@ -153,7 +155,7 @@ const FactorCard = ({ factor, type }) => {
                 onClick={() => setOpen(!open)}
             >
                 {/* Impact icon */}
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-base font-black"
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-base font-black"
                     style={{ background: color + "20", color }}>
                     {impactIcon}
                 </div>
@@ -165,13 +167,13 @@ const FactorCard = ({ factor, type }) => {
                 </div>
 
                 {/* Impact badge */}
-                <span className="text-xs font-bold px-2.5 py-1 rounded-lg flex-shrink-0"
+                <span className="text-xs font-bold px-2.5 py-1 rounded-lg shrink-0"
                     style={{ background: color + "18", color, border: `1px solid ${color}30` }}>
                     {impactLabel}
                 </span>
 
-                {open ? <ChevronUp size={14} className="text-slate-500 flex-shrink-0" />
-                    : <ChevronDown size={14} className="text-slate-500 flex-shrink-0" />}
+                {open ? <ChevronUp size={14} className="text-slate-500 shrink-0" />
+                    : <ChevronDown size={14} className="text-slate-500 shrink-0" />}
             </button>
 
             {open && (
@@ -200,7 +202,21 @@ const Forecast = () => {
     const [chartData, setChartData] = useState([]);
     const todayRef = useRef("2026-03-16");
 
-    const fetchForecast = async (h) => {
+
+     const buildChartData = useCallback((brands) => {
+        const allDates = {};
+        brands.forEach((b) => {
+            [...(b.historical || []), ...(b.forecast || [])].forEach((row) => {
+                if (!allDates[row.date]) allDates[row.date] = { date: row.date };
+                if (row.actual != null) allDates[row.date][`${b.id}_actual`] = row.actual;
+                if (row.predicted != null) allDates[row.date][`${b.id}_forecast`] = row.predicted;
+                if (row.upper != null) allDates[row.date][`${b.id}_upper`] = row.upper;
+                if (row.lower != null) allDates[row.date][`${b.id}_lower`] = row.lower;
+            });
+        });
+        setChartData(Object.values(allDates).sort((a, b) => a.date.localeCompare(b.date)));
+    }, []);
+    const fetchForecast = useCallback(async (h) => {
         setLoading(true);
         setError(null);
         try {
@@ -215,23 +231,11 @@ const Forecast = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [buildChartData, todayRef]); 
 
-    const buildChartData = (brands) => {
-        const allDates = {};
-        brands.forEach((b) => {
-            [...(b.historical || []), ...(b.forecast || [])].forEach((row) => {
-                if (!allDates[row.date]) allDates[row.date] = { date: row.date };
-                if (row.actual != null) allDates[row.date][`${b.id}_actual`] = row.actual;
-                if (row.predicted != null) allDates[row.date][`${b.id}_forecast`] = row.predicted;
-                if (row.upper != null) allDates[row.date][`${b.id}_upper`] = row.upper;
-                if (row.lower != null) allDates[row.date][`${b.id}_lower`] = row.lower;
-            });
-        });
-        setChartData(Object.values(allDates).sort((a, b) => a.date.localeCompare(b.date)));
-    };
+      
 
-    useEffect(() => { fetchForecast(horizon); }, []);
+    useEffect(() => { fetchForecast(horizon); },[fetchForecast, horizon]);
 
     const handleHorizonChange = (val) => {
         setHorizon(val);
@@ -333,7 +337,7 @@ const Forecast = () => {
                 <div className="flex gap-4 mt-4 justify-center">
                     {data.brands.map((b) => (
                         <span key={b.id} className="text-xs text-slate-400 flex items-center gap-2">
-                            <span className="w-4 h-[2px] inline-block rounded" style={{ background: BRAND_COLORS[b.id]?.solid }} />
+                            <span className="w-4 h-0.5 inline-block rounded" style={{ background: BRAND_COLORS[b.id]?.solid }} />
                             {b.name}
                         </span>
                     ))}
@@ -346,10 +350,10 @@ const Forecast = () => {
 
             {/* ── Section 4: AI ANALYST SUMMARY ─────────────────────────── */}
             <div className="glass-card p-6 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 via-purple-500/5 to-transparent pointer-events-none" />
                 <div className="relative">
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm">🤖</div>
+                        <div className="w-8 h-8 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm">🤖</div>
                         <div>
                             <h2 className="text-sm font-black text-white">AI Analyst Report</h2>
                             <p className="text-xs text-slate-500">Generated by Market Intelligence Model</p>
@@ -380,7 +384,7 @@ const Forecast = () => {
                 {/* Section 5: Key Drivers */}
                 <div className="glass-card p-6">
                     <div className="flex items-start gap-3 mb-5">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center shrink-0">
                             <TrendingUp size={18} className="text-emerald-400" />
                         </div>
                         <div>
@@ -398,7 +402,7 @@ const Forecast = () => {
                 {/* Section 6: What Could Change */}
                 <div className="glass-card p-6">
                     <div className="flex items-start gap-3 mb-5">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center shrink-0">
                             <AlertTriangle size={18} className="text-blue-400" />
                         </div>
                         <div>

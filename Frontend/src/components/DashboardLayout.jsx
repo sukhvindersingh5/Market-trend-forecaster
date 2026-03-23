@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { id: 'explorer', label: 'Sentiment Explorer', icon: '🔍', path: '/dashboard/explorer' },
   { id: 'alerts', label: 'Alerts', icon: '🔔', path: '/dashboard/alerts' },
   { id: 'reports', label: 'Reports', icon: '📋', path: '/dashboard/reports' },
-    { id: "future-trends", label: "Future Trends", icon: "📈", path: "/dashboard/future-trends" },
   { id: 'chatbot', label: 'AI Chatbot', icon: '🤖', path: '/dashboard/chatbot' },
   { id: 'forecast', label: 'Forecast', icon: '🔮', path: '/dashboard/forecast' },
 ];
