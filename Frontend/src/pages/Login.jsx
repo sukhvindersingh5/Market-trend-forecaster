@@ -28,8 +28,7 @@ const Login = () => {
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // ✅ Debug (optional)
-      console.log("Token stored:", data.access_token);
+     
 
       // 🚀 Redirect
       navigate("/dashboard", { replace: true });
