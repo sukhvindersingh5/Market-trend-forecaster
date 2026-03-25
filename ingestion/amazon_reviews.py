@@ -1,27 +1,38 @@
 import pandas as pd
 import os
 
-# Load Alexa TSV dataset
-df = pd.read_csv("data/raw/amazon_alexa.tsv", sep="\t")
+# 🔥 FIX: Absolute base path (VERY IMPORTANT)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Rename columns to normalized schema
+# 🔹 Correct input path
+input_path = os.path.join(BASE_DIR, "data/raw/amazon_alexa.tsv")
+
+# 🔹 Correct output path
+output_dir = os.path.join(BASE_DIR, "data/processed")
+output_path = os.path.join(output_dir, "amazon_reviews_clean.csv")
+
+# 🔹 Load dataset
+df = pd.read_csv(input_path, sep="\t")
+
+# 🔹 Clean + normalize
 df_clean = pd.DataFrame({
     "product": "Amazon Alexa / Echo",
-    "review_content": df["verified_reviews"].str.lower().str.strip(),
+    "review_content": df["verified_reviews"].astype(str).str.lower().str.strip(),
     "rating": df["rating"],
     "review_date": df["date"],
     "variant": df["variation"],
     "source": "kaggle_amazon_alexa"
 })
 
-# Drop empty reviews
+# 🔹 Drop empty reviews
 df_clean = df_clean.dropna(subset=["review_content"])
+df_clean = df_clean[df_clean["review_content"].str.strip() != ""]
 
-# Ensure output directory exists
-os.makedirs("data/processed", exist_ok=True)
+# 🔹 Ensure output directory exists
+os.makedirs(output_dir, exist_ok=True)
 
-# Save cleaned data
-output_path = "data/processed/amazon_reviews_clean.csv"
+# 🔹 Save cleaned data
 df_clean.to_csv(output_path, index=False)
 
-print(f"Saved {len(df_clean)} Alexa reviews to {output_path}")
+# 🔥 IMPORTANT: print only number (for backend use)
+print(len(df_clean))
