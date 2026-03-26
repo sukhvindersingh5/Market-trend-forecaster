@@ -6,14 +6,12 @@ import datetime
 import subprocess
 import pandas as pd
 import os
-import sys
 
 router = APIRouter()
 
 # 📁 Absolute base path (VERY IMPORTANT FIX)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 OUTPUT_FILE = os.path.join(BASE_DIR, "data/processed/all_reviews_clean.csv")
-TRACKER_FILE = os.path.join(BASE_DIR, "backend/data/last_update.txt")
 
 
 # ✅ Existing API (UNCHANGED)
@@ -25,7 +23,7 @@ async def insert_raw_data(data: dict, current_user=Depends(get_current_user)):
 
 # ✅ UPDATED API (ERROR-FREE VERSION)
 @router.post("/update-reviews")
-def update_reviews(current_user=Depends(get_current_user)):
+async def update_reviews(current_user=Depends(get_current_user)):
     today = datetime.date.today()
 
     try:
@@ -40,22 +38,13 @@ def update_reviews(current_user=Depends(get_current_user)):
             os.path.join(BASE_DIR, "ingestion/amazon_reviews.py"),
             os.path.join(BASE_DIR, "ingestion/crawl_web_reviews.py"),
             os.path.join(BASE_DIR, "ingestion/youtube_comments.py"),
-            os.path.join(BASE_DIR, "ingestion/news_fetch.py"),
             os.path.join(BASE_DIR, "ingestion/merge_reviews.py"),
-            os.path.join(BASE_DIR, "ingestion/analyze_sentiment.py"),
         ]
 
-        # 🔥 READ CUTOFF TIMESTAMP
-        cutoff = "2000-01-01T00:00:00"
-        os.makedirs(os.path.dirname(TRACKER_FILE), exist_ok=True)
-        if os.path.exists(TRACKER_FILE):
-            with open(TRACKER_FILE, "r") as f:
-                cutoff = f.read().strip()
-
-        # 🔥 RUN SCRIPTS WITH CUTOFF
+        # 🔥 RUN SCRIPTS SAFELY
         for script in scripts:
             result = subprocess.run(
-                [sys.executable, script, cutoff],
+                ["python", script],
                 capture_output=True,
                 text=True
             )
@@ -75,10 +64,6 @@ def update_reviews(current_user=Depends(get_current_user)):
 
         # 🔥 CALCULATE ADDED
         added_reviews = max(new_count - old_count, 0)
-
-        # 🔥 SAVE NEW TIMESTAMP
-        with open(TRACKER_FILE, "w") as f:
-            f.write(datetime.datetime.now().isoformat())
 
         return {
             "status": "success",
