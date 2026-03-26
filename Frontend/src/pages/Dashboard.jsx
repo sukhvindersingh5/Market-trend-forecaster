@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { motion } from "framer-motion";
 
 import "../styles/dashboard.css";
 import { getDashboardOverview } from "../services/dashboardService";
@@ -15,7 +13,6 @@ import RecentActivityPanel from "../components/dashboard/RecentActivityPanel";
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -48,50 +45,7 @@ const Dashboard = () => {
     loadDashboard();
   }, [filters]);
 
-  // 🔥 Update Reviews API Call
-  const updateReviews = async () => {
-    const token = localStorage.getItem("token");
 
-    if (!token) {
-      toast.error("Please login first!");
-      return;
-    }
-
-    setUpdating(true);
-    const updatePromise = fetch("http://localhost:8000/api/update-reviews", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }).then(async (res) => {
-      if (res.status === 401) {
-        throw new Error("Session expired. Please login again.");
-      }
-      if (!res.ok) {
-        throw new Error("Failed to update reviews");
-      }
-      const result = await res.json();
-      return result.message || "Reviews updated successfully!";
-    });
-
-    toast.promise(updatePromise, {
-      loading: "Updating reviews and analyzing sentiment...",
-      success: (msg) => {
-        loadDashboard();
-        return msg;
-      },
-      error: (err) => err.message,
-    });
-
-    try {
-      await updatePromise;
-    } catch (err) {
-      console.error("Update error:", err);
-    } finally {
-      setUpdating(false);
-    }
-  };
 
   // 🔄 Loading UI
   if (loading) {
@@ -114,12 +68,7 @@ const Dashboard = () => {
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="flex flex-col gap-8"
-    >
+    <div className="flex flex-col gap-8 animate-in fade-in duration-700">
 
       {/* 🔥 HEADER + BUTTON */}
       <div className="flex items-center justify-between">
@@ -132,17 +81,7 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <button
-          onClick={updateReviews}
-          disabled={updating}
-          className={`px-4 py-2 rounded-xl text-sm font-semibold shadow-md transition ${
-            updating
-              ? "bg-gray-500 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
-          }`}
-        >
-          {updating ? "Updating..." : "🔄 Update Reviews"}
-        </button>
+
       </div>
 
       {/* 🔍 FILTER BAR */}
@@ -235,7 +174,7 @@ const Dashboard = () => {
         <RecentActivityPanel activities={data.recent_data} />
       </div>
 
-    </motion.div>
+    </div>
   );
 };
 
