@@ -13,7 +13,6 @@ import RecentActivityPanel from "../components/dashboard/RecentActivityPanel";
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -46,48 +45,7 @@ const Dashboard = () => {
     loadDashboard();
   }, [filters]);
 
-  // 🔥 Update Reviews API Call
-  const updateReviews = async () => {
-    setUpdating(true);
 
-    try {
-      const token = localStorage.getItem("token");
-
-      // 🚨 If token missing
-      if (!token) {
-        alert("Please login first!");
-        setUpdating(false);
-        return;
-      }
-
-      const res = await fetch("http://localhost:8000/api/update-reviews", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      // 🚨 If unauthorized
-      if (res.status === 401) {
-        alert("Session expired. Please login again.");
-        setUpdating(false);
-        return;
-      }
-
-      const result = await res.json();
-      alert(result.message || "Reviews updated successfully!");
-
-      // 🔄 Refresh dashboard
-      await loadDashboard();
-
-    } catch (err) {
-      console.error("Update error:", err);
-      alert("Failed to update reviews");
-    } finally {
-      setUpdating(false);
-    }
-  };
 
   // 🔄 Loading UI
   if (loading) {
@@ -123,17 +81,7 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <button
-          onClick={updateReviews}
-          disabled={updating}
-          className={`px-4 py-2 rounded-xl text-sm font-semibold shadow-md transition ${
-            updating
-              ? "bg-gray-500 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
-          }`}
-        >
-          {updating ? "Updating..." : "🔄 Update Reviews"}
-        </button>
+
       </div>
 
       {/* 🔍 FILTER BAR */}

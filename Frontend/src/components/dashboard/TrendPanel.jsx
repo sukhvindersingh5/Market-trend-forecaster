@@ -116,21 +116,31 @@ const TrendPanel = ({ trendData, activeProduct }) => {
         displayColors: true,
         callbacks: {
           title: (items) => {
-            return `Analysis for ${items[0].label}`;
+            const date = items[0].label;
+            if (isComparisonMode) {
+              return `Analysis for ${date}`;
+            }
+            const productName = PRODUCT_COLORS[activeProduct]?.label || activeProduct;
+            return `${productName} - ${date}`;
           },
           label: function (context) {
             const productId = isComparisonMode
               ? Object.keys(trendData)[context.datasetIndex]
               : activeProduct;
-            const productName = PRODUCT_COLORS[productId]?.label || productId;
+            
             const point = (isComparisonMode ? trendData[productId] : trendData[activeProduct])[context.dataIndex];
+            
+            if (isComparisonMode) {
+                const productName = PRODUCT_COLORS[productId]?.label || productId;
+                return `${productName}: ${(context.parsed.y * 100).toFixed(1)}%`;
+            }
 
-            const lines = [
-              `Product: ${productName}`,
-              `Sentiment: ${(point.sentiment * 100).toFixed(1)}%`,
-              `Mentions: ${point.mentions.toLocaleString()}`
-            ];
-            return lines;
+            // Single Product Mode: Distinguish between Sentiment and Mentions datasets
+            if (context.datasetIndex === 0) {
+              return `Sentiment Score: ${(context.parsed.y * 100).toFixed(1)}%`;
+            } else {
+              return `Total Mentions: ${context.parsed.y.toLocaleString()}`;
+            }
           }
         }
       }
