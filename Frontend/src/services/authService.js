@@ -1,3 +1,7 @@
+import API_URL from "./api";
+
+fetch(`${API_URL}/auth/login`)
+
 import axios from "axios";
 
 // 🔥 BASE API
