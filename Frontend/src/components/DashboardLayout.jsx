@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Scale, Search, Bell, FileText, Bot, TrendingUp, LogOut, Command, User, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Scale, Search, Bell, FileText, Bot, TrendingUp, LogOut, Command, User, AlertTriangle, Activity, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getProfile, logout } from '../services/authService';
 
 const getAILabel = (pathname) => {
@@ -43,13 +44,32 @@ function useLastUpdated() {
   return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+// ── Mock Notifications ───────────────────────────────────────────────────────
+const MOCK_NOTIFICATIONS = [
+  { id: 1, type: "alert", title: "Sentiment Drop", message: "15% drop in sentiment detected for Echo Dot.", time: "10 mins ago", icon: AlertTriangle, color: "text-red-400", bg: "bg-red-500/10" },
+  { id: 2, type: "trend", title: "New Trending Topic", message: "'Battery Drain' mentions rising across Reddit.", time: "1 hr ago", icon: Activity, color: "text-blue-400", bg: "bg-blue-500/10" },
+  { id: 3, type: "system", title: "Report Ready", message: "Your Weekly Market Intelligence Report is generated.", time: "2 hrs ago", icon: CheckCircle2, color: "text-accent", bg: "bg-accent/10" }
+];
+
 // ── DashboardLayout ────────────────────────────────────────────────────────
 const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const lastUpdated = useLastUpdated();
   const [profile, setProfile] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notifRef = useRef(null);
   const meta = PAGE_META[location.pathname] || { title: 'Dashboard', subtitle: '' };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -110,10 +130,61 @@ const DashboardLayout = () => {
           <div className="w-px h-5 bg-white/10 hidden md:block" />
 
           {/* Bell Notification */}
-          <button className="relative p-2 text-slate-400 hover:text-white transition-colors cursor-pointer group">
-            <Bell className="w-4.5 h-4.5 group-hover:animate-[wave_1s_ease-in-out_infinite]" />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-400 rounded-full border border-slate-900 shadow-[0_0_8px_rgba(248,113,113,0.8)]" />
-          </button>
+          <div className="relative" ref={notifRef}>
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className={`relative p-2 transition-colors cursor-pointer group rounded-lg ${showNotifications ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+            >
+              <Bell className={`w-4.5 h-4.5 ${!showNotifications && 'group-hover:animate-[wave_1s_ease-in-out_infinite]'}`} />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-400 rounded-full border border-slate-900 shadow-[0_0_8px_rgba(248,113,113,0.8)]" />
+            </button>
+
+            {/* Notification Dropdown */}
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute right-0 mt-3 w-80 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right"
+                >
+                  <div className="p-4 border-b border-white/10 flex justify-between items-center bg-slate-800/50">
+                    <h3 className="text-sm font-bold text-white">Notifications</h3>
+                    <button className="text-[10px] text-blue-400 hover:text-blue-300 font-bold uppercase tracking-wider transition-colors cursor-pointer">
+                      Mark all read
+                    </button>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {MOCK_NOTIFICATIONS.map((notif) => {
+                      const Icon = notif.icon;
+                      return (
+                        <div key={notif.id} className="p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group">
+                          <div className="flex gap-3">
+                            <div className={`mt-0.5 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${notif.bg} ${notif.color} group-hover:scale-110 transition-transform`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-xs font-bold text-slate-200">{notif.title}</span>
+                                <span className="text-[10px] text-slate-500 whitespace-nowrap">{notif.time}</span>
+                              </div>
+                              <p className="text-[11px] text-slate-400 leading-snug">
+                                {notif.message}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="p-3 text-center border-t border-white/5 hover:bg-white/5 transition-colors cursor-pointer cursor-pointer">
+                    <span className="text-[11px] text-slate-400 font-bold">View full log &rarr;</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Live indicator */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20">
