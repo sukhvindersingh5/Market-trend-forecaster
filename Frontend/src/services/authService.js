@@ -1,15 +1,9 @@
-import API_URL from "./api";
-
-fetch(`${API_URL}/auth/login`)
-
 import axios from "axios";
-
-// 🔥 BASE API
-const API_URL = "http://localhost:8000";;
+import API_URL from "./api";
 
 // 🔥 CREATE AXIOS INSTANCE
 const api = axios.create({
-  baseURL: API_BASE,
+  baseURL: API_URL,
 });
 
 // 🔐 AUTO ATTACH TOKEN TO EVERY REQUEST
